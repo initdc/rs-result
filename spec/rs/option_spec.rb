@@ -3,6 +3,10 @@
 RSpec.describe(Rs::Option) do
   # https://doc.rust-lang.org/std/option/enum.Option.html
 
+  it "new" do
+    expect { Some.new(nil) }.to(raise_error(Rs::Option::ArgumentError, "Some value cannot be nil"))
+  end
+
   it "some?" do
     x = Some.new(2)
     expect(x.some?).to(be(true))
