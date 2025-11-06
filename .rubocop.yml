@@ -1,0 +1,8 @@
+inherit_gem:
+  rubocop-config-crystal: .rubocop.yml
+
+Metrics/BlockLength:
+  Enabled: false
+
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
