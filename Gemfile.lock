@@ -47,7 +47,10 @@ GEM
     rubocop-ast (1.47.1)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
-    rubocop-config-crystal (0.0.1)
+    rubocop-config-crystal (0.0.2)
+    rubocop-rspec (3.7.0)
+      lint_roller (~> 1.1)
+      rubocop (~> 1.72, >= 1.72.1)
     ruby-progressbar (1.13.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
@@ -62,7 +65,8 @@ DEPENDENCIES
   rs-result!
   rspec (~> 3.0)
   rubocop (~> 1.21)
-  rubocop-config-crystal
+  rubocop-config-crystal (~> 0.0.2)
+  rubocop-rspec
 
 BUNDLED WITH
    2.4.22

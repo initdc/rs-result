@@ -13,4 +13,6 @@ gem "rspec", "~> 3.0"
 
 gem "rubocop", "~> 1.21"
 
-gem "rubocop-config-crystal"
+gem "rubocop-config-crystal", "~> 0.0.2"
+
+gem "rubocop-rspec", require: false
