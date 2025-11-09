@@ -8,6 +8,7 @@ module Rs
   module Option
     class ArgumentError < StandardError; end
     class UnwrapNone < StandardError; end
+    class TypeError < StandardError; end
 
     def some?
       @some
@@ -64,20 +65,52 @@ end
 class Some
   include Rs::Option
 
-  def initialize(value)
+  attr_reader :type
+  attr_reader :some
+  attr_reader :value
+
+  private :value
+
+  def initialize(value, type: nil)
     if value == nil
       raise(Rs::Option::ArgumentError, "Some value cannot be nil")
     end
 
-    @value = value
+    if type
+      if value.class != type
+        raise(Rs::Option::TypeError, "Value type #{value.class} does not match #{type}")
+      end
+
+      @type = type
+    else
+      @type = value.class
+    end
+
     @some = true
+    @value = value
+  end
+
+  def ==(other)
+    other.is_a?(Some) && @type == other.type && @value == other.unwrap
   end
 end
 
 class None
   include Rs::Option
 
+  attr_reader :type
+  attr_reader :some
+  attr_reader :value
+
+  private :value
+
   def initialize
+    @type = NilClass
     @some = false
+    @value = nil
+  end
+
+  def ==(other)
+    other.is_a? None
   end
 end

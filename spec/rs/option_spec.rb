@@ -85,4 +85,37 @@ RSpec.describe Rs::Option do
     expect(x.unwrap_or).to be_nil
     expect(y.unwrap_or).to eq 12
   end
+
+  it "pattern_matching" do
+    def divide(numerator, denominator)
+      if denominator == 0
+        None.new
+      else
+        Some.new(numerator / denominator)
+      end
+    end
+
+    result = divide(3, 1)
+    case result
+    when Some
+      x = result.unwrap
+    else
+      x = "Cannot divide by 0"
+    end
+    expect(x).to eq 3
+  end
+
+  it "type ==" do
+    a = Some.new(1)
+    b = Some.new(1.0)
+    c = Some.new(1.0, type: Float)
+    d = Some.new("a")
+    e = None.new
+
+    expect(a == b).to be false
+    expect(a == c).to be false
+    expect(b == c).to be true
+    expect(a == d).to be false
+    expect(a == e).to be false
+  end
 end

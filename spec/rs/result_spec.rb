@@ -133,4 +133,28 @@ RSpec.describe(Rs::Result) do
     expect(Ok.new(2).unwrap_or_else { |x| x.size }).to eq 2
     expect(Err.new("foo").unwrap_or_else { |x| x.size }).to eq 3
   end
+
+  it "type ==" do
+    a = Ok.new(1)
+    b = Ok.new(1.0)
+    c = Ok.new(1.0, type: Float)
+    d = Ok.new("a")
+
+    e = Err.new(1)
+    f = Err.new(1.0)
+    g = Err.new(1.0, type: Float)
+    h = Err.new("a")
+    i = Err.new(nil)
+
+    expect(a == b).to be false
+    expect(a == c).to be false
+    expect(b == c).to be true
+    expect(a == d).to be false
+
+    expect(e == f).to be false
+    expect(e == g).to be false
+    expect(f == g).to be true
+    expect(e == h).to be false
+    expect(e == i).to be false
+  end
 end
