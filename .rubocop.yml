@@ -18,3 +18,12 @@ RSpec/ExampleLength:
 
 RSpec/MissingExpectationTargetMethod:
   Enabled: false
+
+Style/RaiseArgs:
+  EnforcedStyle: compact
+
+Lint/MissingSuper:
+  Enabled: false
+
+Naming/PredicatePrefix:
+  Enabled: false

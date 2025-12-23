@@ -4,53 +4,71 @@ RSpec.describe Rs::Option do
   # https://doc.rust-lang.org/std/option/enum.Option.html
 
   it "new" do
-    expect { Some.new(nil) }.to raise_error Rs::Option::ArgumentError, "Some value cannot be nil"
-  end
+    expect { Some[nil] {} }.to raise_error Rs::Option::TypeError
+    expect { Some[NilClass] { nil } }.to raise_error Rs::Option::TypeNilClass
+    expect { Some[Integer] { nil } }.to raise_error Rs::Option::TypeMismatch
+    expect { Some.new(nil) }.to raise_error Rs::Option::WrapNil
 
-  it "some?" do
+    expect { None[nil] }.to raise_error Rs::Option::TypeError
+    expect { None[NilClass] }.to raise_error Rs::Option::TypeNilClass
+    expect { None.new(nil) }.to raise_error Rs::Option::TypeError
+    expect { None.new(NilClass) }.to raise_error Rs::Option::TypeNilClass
+
     x = Some.new(2)
-    expect(x.some?).to be true
+    y = Some[Integer] { 2 }
+    expect(x).to eq y
+
+    x = None.new(Integer)
+    y = None[Integer]
+    expect(x).to eq y
 
     x = None.new
-    expect(x.some?).to be false
+    y = None[Class]
+    expect(x).to eq y
   end
 
-  it "some_and proc" do
+  it "is_some" do
     x = Some.new(2)
-    expect(x.some_and).to be true
-    expect(x.some_and { |x| x > 1 }).to be true
+    expect(x.is_some).to be true
+
+    x = None.new
+    expect(x.is_some).to be false
+  end
+
+  it "is_some_and proc" do
+    x = Some.new(2)
+    expect(x.is_some_and { |x| x > 1 }).to be true
 
     x = Some.new(0)
-    expect(x.some_and { |x| x > 1 }).to be false
+    expect(x.is_some_and { |x| x > 1 }).to be false
 
     x = None.new
-    expect(x.some_and { |x| x.to_i > 1 }).to be false
+    expect(x.is_some_and { |x| x.to_i > 1 }).to be false
 
     x = Some.new("str")
-    expect(x.some_and { |x| x.size > 1 }).to be true
+    expect(x.is_some_and { |x| x.size > 1 }).to be true
   end
 
-  it "none?" do
+  it "is_none" do
     x = Some.new(2)
-    expect(x.none?).to be false
+    expect(x.is_none).to be false
 
     x = None.new
-    expect(x.none?).to be true
+    expect(x.is_none).to be true
   end
 
-  it "none_or proc" do
+  it "is_none_or proc" do
     x = Some.new(2)
-    expect(x.none_or).to be false
-    expect(x.none_or { |x| x > 1 }).to be true
+    expect(x.is_none_or { |x| x > 1 }).to be true
 
     x = Some.new(0)
-    expect(x.none_or { |x| x > 1 }).to be false
+    expect(x.is_none_or { |x| x > 1 }).to be false
 
     x = None.new
-    expect(x.none_or { |x| x.to_i > 1 }).to be true
+    expect(x.is_none_or { |x| x.to_i > 1 }).to be true
 
     x = Some.new("str")
-    expect(x.none_or { |x| x.size > 1 }).to be true
+    expect(x.is_none_or { |x| x.size > 1 }).to be true
   end
 
   it "unwrap" do
@@ -66,12 +84,6 @@ RSpec.describe Rs::Option do
     expect(None.new.unwrap_or("bike")).to eq "bike"
   end
 
-  it "unwrap_or proc" do
-    k = 10
-    expect(Some.new(4).unwrap_or { 2 * k }).to eq 4
-    expect(None.new.unwrap_or { 2 * k }).to eq 20
-  end
-
   it "unwrap_or_else proc" do
     k = 10
     expect(Some.new(4).unwrap_or_else { 2 * k }).to eq 4
@@ -82,8 +94,8 @@ RSpec.describe Rs::Option do
     x = None.new
     y = Some.new(12)
 
-    expect(x.unwrap_or).to be_nil
-    expect(y.unwrap_or).to eq 12
+    expect(x.unwrap_or(0)).to eq 0
+    expect(y.unwrap_or(0)).to eq 12
   end
 
   it "pattern_matching" do
@@ -108,7 +120,7 @@ RSpec.describe Rs::Option do
   it "type ==" do
     a = Some.new(1)
     b = Some.new(1.0)
-    c = Some.new(1.0, type: Float)
+    c = Some[Float] { 1.0 }
     d = Some.new("a")
     e = None.new
 
