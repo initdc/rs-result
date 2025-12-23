@@ -36,11 +36,11 @@ module Rs
     end
 
     def ok
-      is_ok ? Some[@value.class] { @value } : None[@value_type]
+      is_ok ? Some[@value_type] { @value } : None[@value_type]
     end
 
     def err
-      is_err ? Some[@error.class] { @error } : None[@error_type]
+      is_err ? Some[@error_type] { @error } : None[@error_type]
     end
 
     def expect(msg)
@@ -70,6 +70,7 @@ module Rs
 end
 
 class Ok < Rs::Result
+  attr_accessor :value_type
   attr_accessor :error_type
 
   def self.[](value_type, error_type, &block)
@@ -96,11 +97,11 @@ class Ok < Rs::Result
   end
 
   def inspect
-    "Ok[#{@value.class}, #{@error_type}] { #{@value.inspect} }"
+    "Ok[#{@value_type}, #{@error_type}] { #{@value.inspect} }"
   end
 
   def ==(other)
-    other.is_a?(Ok) && @value == other.unwrap && @value.class == other.unwrap.class && @error_type == other.error_type
+    other.is_a?(Ok) && @value == other.unwrap && @value_type == other.value_type && @error_type == other.error_type
   end
 
   def initialize(value)
@@ -109,12 +110,14 @@ class Ok < Rs::Result
     end
 
     @value = value
+    @value_type = value.class
     @error_type = Class
   end
 end
 
 class Err < Rs::Result
   attr_accessor :value_type
+  attr_accessor :error_type
 
   def self.[](value_type, error_type, &block)
     if !value_type.is_a?(Class) || !error_type.is_a?(Class)
@@ -140,11 +143,11 @@ class Err < Rs::Result
   end
 
   def inspect
-    "Err[#{@value_type}, #{@error.class}] { #{@error.inspect} }"
+    "Err[#{@value_type}, #{@error_type}] { #{@error.inspect} }"
   end
 
   def ==(other)
-    other.is_a?(Err) && @error == other.unwrap_err && @error.class == other.unwrap_err.class && @value_type == other.value_type
+    other.is_a?(Err) && @error == other.unwrap_err && @value_type == other.value_type && @error_type == other.error_type
   end
 
   def initialize(error)
@@ -153,6 +156,7 @@ class Err < Rs::Result
     end
 
     @error = error
+    @error_type = error.class
     @value_type = Class
   end
 end

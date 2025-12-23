@@ -7,8 +7,8 @@ module Rs
   # https://doc.rust-lang.org/src/core/option.rs.html
   class Option
     class TypeError < StandardError
-      def initialize(type)
-        super("Expected #{type} to be a Class")
+      def initialize(value_type)
+        super("Expected #{value_type} to be a Class")
       end
     end
 
@@ -52,29 +52,31 @@ module Rs
 end
 
 class Some < Rs::Option
-  def self.[](type, &block)
-    if !type.is_a?(Class)
-      raise TypeError.new(type)
+  attr_reader :value_type
+
+  def self.[](value_type, &block)
+    if !value_type.is_a?(Class)
+      raise TypeError.new(value_type)
     end
 
-    if type == NilClass
+    if value_type == NilClass
       raise TypeNilClass.new("Cannot create Some[T] with NilClass")
     end
 
     value = block.call
-    if !value.is_a?(type)
-      raise TypeMismatch.new("Expected 'Some[#{type}] { #{value.inspect} }' block.call to be #{type}, not #{value.class}")
+    if !value.is_a?(value_type)
+      raise TypeMismatch.new("Expected 'Some[#{value_type}] { #{value.inspect} }' block.call to be #{value_type}, not #{value.class}")
     end
 
     new(value)
   end
 
   def inspect
-    "Some[#{@value.class}] { #{@value.inspect} }"
+    "Some[#{@value_type}] { #{@value.inspect} }"
   end
 
   def ==(other)
-    other.is_a?(Some) && @value == other.unwrap && @value.class == other.unwrap.class
+    other.is_a?(Some) && @value == other.unwrap && @value_type == other.value_type
   end
 
   def initialize(value)
@@ -83,33 +85,34 @@ class Some < Rs::Option
     end
 
     @value = value
+    @value_type = value.class
   end
 end
 
 class None < Rs::Option
-  attr_reader :type
+  attr_reader :value_type
 
-  def self.[](type)
-    new(type)
+  def self.[](value_type)
+    new(value_type)
   end
 
   def inspect
-    "None[#{@type}]"
+    "None[#{@value_type}]"
   end
 
   def ==(other)
-    other.is_a?(None) && @type == other.type
+    other.is_a?(None) && @value_type == other.value_type
   end
 
-  def initialize(type = Class)
-    if !type.is_a?(Class)
-      raise TypeError.new(type)
+  def initialize(value_type = Class)
+    if !value_type.is_a?(Class)
+      raise TypeError.new(value_type)
     end
 
-    if type == NilClass
+    if value_type == NilClass
       raise TypeNilClass.new("Cannot create None[T] with NilClass")
     end
 
-    @type = type
+    @value_type = value_type
   end
 end
