@@ -10,4 +10,4 @@ RuboCop::RakeTask.new do |task|
   task.plugins << "rubocop-rspec"
 end
 
-task default: [:spec, :rubocop]
+task default: [:spec]

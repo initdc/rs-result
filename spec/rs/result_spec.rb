@@ -180,4 +180,117 @@ RSpec.describe(Rs::Result) do
     expect(f == g).to be true
     expect(e == h).to be false
   end
+
+  it "map" do
+    x = Ok[Integer, String] { 2 }
+    y = Err[Integer, String] { "error" }
+
+    expect(x.map(String) { |x| (x * 2).to_s }).to eq Ok[String, String] { "4" }
+    expect(y.map(String) { |x| (x * 2).to_s }).to eq Err[String, String] { "error" }
+  end
+
+  it "map_or" do
+    x = Ok.new(2)
+    y = Err.new("error")
+
+    expect(x.map_or(0) { |x| x * 2 }).to eq 4
+    expect(y.map_or(0) { |x| x * 2 }).to eq 0
+  end
+
+  it "map_or_else" do
+    x = Ok.new(2)
+    y = Err.new("error")
+
+    expect(x.map_or_else(lambda { |e| e.size }) { |x| x * 2 }).to eq 4
+    expect(y.map_or_else(lambda { |e| e.size }) { |x| x * 2 }).to eq 5
+  end
+
+  it "map_err" do
+    x = Ok[String, String] { "foo" }
+    y = Err[String, String] { "2" }
+
+    expect(x.map_err(Integer) { |e| e.to_i }).to eq Ok[String, Integer] { "foo" }
+    expect(y.map_err(Integer) { |e| e.to_i }).to eq Err[String, Integer] { 2 }
+  end
+
+  it "tap" do
+    x = Ok.new(2)
+    y = Err.new("error")
+
+    result = []
+    x.tap { |v| result << v }
+    y.tap { |v| result << v }
+
+    expect(result).to eq [2]
+    expect(x).to eq Ok.new(2)
+    expect(y).to eq Err.new("error")
+  end
+
+  it "tap_err" do
+    x = Ok.new(2)
+    y = Err.new("error")
+
+    result = []
+    x.tap_err { |e| result << e }
+    y.tap_err { |e| result << e }
+
+    expect(result).to eq ["error"]
+    expect(x).to eq Ok.new(2)
+    expect(y).to eq Err.new("error")
+  end
+
+  it "and" do
+    x = Ok.new(2)
+    y = Err.new("error")
+
+    expect(x.and(Ok.new("4"))).to eq Ok.new("4")
+    expect(y.and(Ok.new(4.0))).to eq Err[Float, String] { "error" }
+  end
+
+  it "and_then" do
+    x = Ok.new(2)
+    y = Err.new("error")
+
+    expect(x.and_then(String) { |x| Ok.new((x * 2).to_s) }).to eq Ok.new("4")
+    expect(y.and_then(Float) { |x| Ok.new(x * 2.0) }).to eq Err[Float, String] { "error" }
+  end
+
+  it "or" do
+    x = Ok.new(2)
+    y = Err[Integer, String] { "error" }
+
+    z = Err[Integer, FalseClass] { false }
+    expect(x.or(z)).to eq Ok[Integer, FalseClass] { 2 }
+    expect(y.or(z)).to eq Err[Integer, FalseClass] { false }
+  end
+
+  it "or_else" do
+    x = Ok.new(2)
+    y = Err[Integer, String] { "error" }
+
+    z = Err[Integer, FalseClass] { false }
+    expect(x.or_else(FalseClass) { |e| z }).to eq Ok[Integer, FalseClass] { 2 }
+    expect(y.or_else(FalseClass) { |e| z }).to eq Err[Integer, FalseClass] { false }
+  end
+
+  it "from_or" do
+    x = described_class.from_or(Integer, "error") { 2 }
+    expect(x).to eq Ok[Integer, String] { 2 }
+  end
+
+  it "from_or?" do
+    x = described_class.from_or?(Integer, "error") { 2 }
+    y = described_class.from_or?(Integer, "error") {}
+
+    expect(x).to eq Ok[Integer, String] { 2 }
+    expect(y).to eq Err[Integer, String] { "error" }
+  end
+
+  it "from_or!" do
+    x = described_class.from_or!(Integer, "error") { 2 }
+    y = described_class.from_or!(Integer, "error") { raise RuntimeError.new("Error") }
+
+    expect(x).to eq Ok[Integer, String] { 2 }
+    expect(y).to eq Err[Integer, String] { "error" }
+  end
 end

@@ -1,6 +1,115 @@
 module Rs
-  module Result
-    VERSION: String
-    # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+  # https://doc.rust-lang.org/std/result/index.html
+  # https://doc.rust-lang.org/std/result/enum.Result.html
+  # https://doc.rust-lang.org/src/core/result.rs.html
+  class Result
+    class TypeError < StandardError
+      def initialize: (untyped value_type, untyped error_type) -> void
+    end
+
+    class TypeNilClass < StandardError
+    end
+
+    class TypeMismatch < StandardError
+    end
+
+    class WrapNil < StandardError
+    end
+
+    class UnwrapOnErr < StandardError
+    end
+
+    class UnwrapErrOnOk < StandardError
+    end
+
+    def is_ok: () -> untyped
+
+    def is_ok_and: () { (?) -> untyped } -> (untyped | false)
+
+    def is_err: () -> untyped
+
+    def is_err_and: () { (?) -> untyped } -> (untyped | false)
+
+    def ok: () -> untyped
+
+    def err: () -> untyped
+
+    def map: (untyped value_type) { (?) -> untyped } -> untyped
+
+    def map_or: (untyped default) { (?) -> untyped } -> untyped
+
+    def map_or_else: (untyped default) { (?) -> untyped } -> untyped
+
+    def map_err: (untyped error_type) { (?) -> untyped } -> untyped
+
+    def tap: () { (?) -> untyped } -> self
+
+    def tap_err: () { (?) -> untyped } -> self
+
+    def expect: (untyped msg) -> untyped
+
+    def unwrap: () -> untyped
+
+    def expect_err: (untyped msg) -> untyped
+
+    def unwrap_err: () -> untyped
+
+    def and: (untyped other) -> untyped
+
+    def and_then: (untyped value_type) { (?) -> untyped } -> untyped
+
+    def or: (untyped other) -> untyped
+
+    def or_else: (untyped error_type) { (?) -> untyped } -> untyped
+
+    def unwrap_or: (untyped default) -> untyped
+
+    def unwrap_or_else: () { (?) -> untyped } -> untyped
+
+    def self.from_or: (untyped value_type, untyped error) { (?) -> untyped } -> untyped
+
+    def self.from_or?: (untyped value_type, untyped error) { (?) -> untyped } -> untyped
+
+    def self.from_or!: (untyped value_type, untyped error) { (?) -> untyped } -> untyped
   end
+end
+
+class Ok < Rs::Result
+  @value: untyped
+
+  @value_type: untyped
+
+  @error_type: untyped
+
+  attr_accessor value_type: untyped
+
+  attr_accessor error_type: untyped
+
+  def self.[]: (untyped value_type, untyped error_type) { (?) -> untyped } -> untyped
+
+  def inspect: () -> ::String
+
+  def ==: (untyped other) -> untyped
+
+  def initialize: (untyped value) -> void
+end
+
+class Err < Rs::Result
+  @error: untyped
+
+  @error_type: untyped
+
+  @value_type: untyped
+
+  attr_accessor value_type: untyped
+
+  attr_accessor error_type: untyped
+
+  def self.[]: (untyped value_type, untyped error_type) { (?) -> untyped } -> untyped
+
+  def inspect: () -> ::String
+
+  def ==: (untyped other) -> untyped
+
+  def initialize: (untyped error) -> void
 end

@@ -36,11 +36,59 @@ module Rs
     end
 
     def ok
-      is_ok ? Some[@value_type] { @value } : None[@value_type]
+      if is_ok
+        Some[@value_type] { @value }
+      else
+        None[@value_type]
+      end
     end
 
     def err
-      is_err ? Some[@error_type] { @error } : None[@error_type]
+      if is_err
+        Some[@error_type] { @error }
+      else
+        None[@error_type]
+      end
+    end
+
+    def map(value_type, &block)
+      if is_ok
+        Ok[value_type, @error_type] { block.call(@value) }
+      else
+        Err[value_type, @error_type] { @error }
+      end
+    end
+
+    def map_or(default, &block)
+      is_ok ? block.call(@value) : default
+    end
+
+    def map_or_else(default, &block)
+      is_ok ? block.call(@value) : default.call(@error)
+    end
+
+    def map_err(error_type, &block)
+      if is_ok
+        Ok[@value_type, error_type] { @value }
+      else
+        Err[@value_type, error_type] { block.call(@error) }
+      end
+    end
+
+    def tap(&block)
+      if is_ok
+        value = @value
+        block.call(value)
+      end
+      self
+    end
+
+    def tap_err(&block)
+      if is_err
+        error = @error
+        block.call(error)
+      end
+      self
     end
 
     def expect(msg)
@@ -51,6 +99,46 @@ module Rs
       is_ok ? @value : raise(UnwrapOnErr.new("called unwrap on an Err value: #{@error}"))
     end
 
+    def expect_err(msg)
+      is_ok ? raise(UnwrapErrOnOk.new("#{msg}: #{@value}")) : @error
+    end
+
+    def unwrap_err
+      is_ok ? raise(UnwrapErrOnOk.new("called unwrap_err() on an Ok value: #{@value}")) : @error
+    end
+
+    def and(other)
+      if is_ok
+        other
+      else
+        Err[other.value_type, @error_type] { @error }
+      end
+    end
+
+    def and_then(value_type, &block)
+      if is_ok
+        block.call(@value)
+      else
+        Err[value_type, @error_type] { @error }
+      end
+    end
+
+    def or(other)
+      if is_ok
+        Ok[@value_type, other.error_type] { @value }
+      else
+        other
+      end
+    end
+
+    def or_else(error_type, &block)
+      if is_ok
+        Ok[@value_type, error_type] { @value }
+      else
+        block.call(@error)
+      end
+    end
+
     def unwrap_or(default)
       is_ok ? @value : default
     end
@@ -59,12 +147,24 @@ module Rs
       is_ok ? @value : block.call(@error)
     end
 
-    def expect_err(msg)
-      is_ok ? raise(UnwrapErrOnOk.new("#{msg}: #{@value}")) : @error
+    def self.from_or(value_type, error, &block)
+      Ok[value_type, error.class] { block.call }
     end
 
-    def unwrap_err
-      is_ok ? raise(UnwrapErrOnOk.new("called unwrap_err() on an Ok value: #{@value}")) : @error
+    def self.from_or?(value_type, error, &block)
+      value = block.call
+      if value == nil
+        Err[value_type, error.class] { error }
+      else
+        Ok[value_type, error.class] { value }
+      end
+    end
+
+    def self.from_or!(value_type, error, &block)
+      value = block.call
+      Ok[value_type, error.class] { value }
+    rescue StandardError
+      Err[value_type, error.class] { error }
     end
   end
 end

@@ -1,0 +1,98 @@
+module Rs
+  # https://doc.rust-lang.org/std/option/index.html
+  # https://doc.rust-lang.org/std/option/enum.Option.html
+  # https://doc.rust-lang.org/src/core/option.rs.html
+  class Option
+    class TypeError < StandardError
+      def initialize: (untyped value_type) -> void
+    end
+
+    class TypeNilClass < StandardError
+    end
+
+    class TypeMismatch < StandardError
+    end
+
+    class WrapNil < StandardError
+    end
+
+    class UnwrapNone < StandardError
+    end
+
+    def is_some: () -> untyped
+
+    def is_some_and: () { (?) -> untyped } -> (untyped | false)
+
+    def is_none: () -> untyped
+
+    def is_none_or: () { (?) -> untyped } -> (true | untyped)
+
+    def expect: (untyped msg) -> untyped
+
+    def unwrap: () -> untyped
+
+    def unwrap_or: (untyped default) -> untyped
+
+    def unwrap_or_else: () { (?) -> untyped } -> untyped
+
+    def map: (untyped value_type) { (?) -> untyped } -> untyped
+
+    def tap: () { (?) -> untyped } -> self
+
+    def map_or: (untyped default) { (?) -> untyped } -> untyped
+
+    def map_or_else: (untyped default) { (?) -> untyped } -> untyped
+
+    def ok_or: (untyped error) -> untyped
+
+    def ok_or_else: () { (?) -> untyped } -> untyped
+
+    def and: (untyped other) -> untyped
+
+    def and_then: (untyped value_type) { (?) -> untyped } -> untyped
+
+    def select: () { (?) -> untyped } -> untyped
+
+    def or: (untyped other) -> (self | untyped)
+
+    def or_else: () { (?) -> untyped } -> (self | untyped)
+
+    def xor: (untyped other) -> untyped
+
+    def self.from: (untyped value_type) { (?) -> untyped } -> untyped
+
+    def self.from?: (untyped value_type) { (?) -> untyped } -> untyped
+
+    def self.from!: (untyped value_type) { (?) -> untyped } -> untyped
+  end
+end
+
+class Some < Rs::Option
+  @value: untyped
+
+  @value_type: untyped
+
+  attr_reader value_type: untyped
+
+  def self.[]: (untyped value_type) { (?) -> untyped } -> untyped
+
+  def inspect: () -> ::String
+
+  def ==: (untyped other) -> untyped
+
+  def initialize: (untyped value) -> void
+end
+
+class None < Rs::Option
+  @value_type: untyped
+
+  attr_reader value_type: untyped
+
+  def self.[]: (untyped value_type) -> untyped
+
+  def inspect: () -> ::String
+
+  def ==: (untyped other) -> untyped
+
+  def initialize: (?untyped value_type) -> void
+end

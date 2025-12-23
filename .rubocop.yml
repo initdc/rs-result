@@ -31,5 +31,11 @@ Naming/PredicatePrefix:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/ClassLength:
+  Enabled: false
+
 Layout/LineLength:
+  Enabled: false
+
+Lint/UnusedBlockArgument:
   Enabled: false

@@ -48,6 +48,109 @@ module Rs
     def unwrap_or_else(&block)
       is_some ? @value : block.call
     end
+
+    def map(value_type, &block)
+      if is_some
+        Some[value_type] { block.call(@value) }
+      else
+        None[value_type]
+      end
+    end
+
+    def tap(&block)
+      if is_some
+        value = @value
+        block.call(value)
+      end
+      self
+    end
+
+    def map_or(default, &block)
+      is_some ? block.call(@value) : default
+    end
+
+    def map_or_else(default, &block)
+      is_some ? block.call(@value) : default.call
+    end
+
+    def ok_or(error)
+      if is_some
+        Ok[@value_type, error.class] { @value }
+      else
+        Err[@value_type, error.class] { error }
+      end
+    end
+
+    def ok_or_else(&block)
+      error = block.call
+      if is_some
+        Ok[@value_type, error.class] { @value }
+      else
+        Err[@value_type, error.class] { error }
+      end
+    end
+
+    def and(other)
+      is_some ? other : None[other.value_type]
+    end
+
+    def and_then(value_type, &block)
+      is_some ? block.call(@value) : None[value_type]
+    end
+
+    def select(&block)
+      if is_some
+        value = @value
+        block.call(value) ? self : None[@value_type]
+      else
+        None[@value_type]
+      end
+    end
+
+    def or(other)
+      if is_some
+        self
+      else
+        other
+      end
+    end
+
+    def or_else(&block)
+      is_some ? self : block.call
+    end
+
+    def xor(other)
+      case [is_some, other.is_some]
+      when [true, false]
+        self
+      when [false, true]
+        other
+      when [true, true]
+        None[@value_type]
+      else
+        None[@value_type]
+      end
+    end
+
+    def self.from(value_type, &block)
+      Some[value_type, &block]
+    end
+
+    def self.from?(value_type, &block)
+      value = block.call
+      if value == nil
+        None[value_type]
+      else
+        Some[value_type] { value }
+      end
+    end
+
+    def self.from!(value_type, &block)
+      value = block.call
+      Some[value_type] { value }
+    rescue StandardError
+      None[value_type]
+    end
   end
 end
 
