@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "rs/option"
 require "rs/result"
 
 RSpec.configure do |config|

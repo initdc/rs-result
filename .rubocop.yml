@@ -27,3 +27,9 @@ Lint/MissingSuper:
 
 Naming/PredicatePrefix:
   Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Layout/LineLength:
+  Enabled: false
