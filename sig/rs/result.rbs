@@ -2,7 +2,9 @@ module Rs
   # https://doc.rust-lang.org/std/result/index.html
   # https://doc.rust-lang.org/std/result/enum.Result.html
   # https://doc.rust-lang.org/src/core/result.rs.html
-  class Result
+  class Result[V, E]
+    VERSION: String
+
     class TypeError < StandardError
       def initialize: (untyped value_type, untyped error_type) -> void
     end
@@ -74,7 +76,7 @@ module Rs
   end
 end
 
-class Ok < Rs::Result
+class Ok[V, E] < Rs::Result[V, E]
   @value: untyped
 
   @value_type: untyped
@@ -94,7 +96,7 @@ class Ok < Rs::Result
   def initialize: (untyped value) -> void
 end
 
-class Err < Rs::Result
+class Err[V, E] < Rs::Result[V, E]
   @error: untyped
 
   @error_type: untyped

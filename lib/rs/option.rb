@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "result/version"
+
 module Rs
   # https://doc.rust-lang.org/std/option/index.html
   # https://doc.rust-lang.org/std/option/enum.Option.html

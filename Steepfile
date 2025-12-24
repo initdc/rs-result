@@ -6,10 +6,10 @@ target :lib do
   signature "sig"
 
   # Directory name
-  check "lib"
+  check "lib/rs/types"
   # ignore "lib/templates/*.rb"
 
-  # library "pathname"              # Standard libraries
+  # library "rs/types"              # Standard libraries
   # library "strong_json"           # Gems
 
   # configure_code_diagnostics(D::Ruby.default)      # `default` diagnostics setting (applies by default)

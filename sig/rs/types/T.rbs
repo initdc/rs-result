@@ -1,0 +1,18 @@
+class T[T]
+  @value: T
+
+  def initialize: (T value) -> void
+  
+  # every thing is object
+  # why raise error Type `E` does not have method `class`
+  def inspect: () -> ::String
+end
+
+class TE[T, E]
+  @value: T
+
+  @error: E
+
+  def initialize: (T value, E error) -> void
+  def inspect: () -> ::String
+end

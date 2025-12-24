@@ -2,9 +2,11 @@ module Rs
   # https://doc.rust-lang.org/std/option/index.html
   # https://doc.rust-lang.org/std/option/enum.Option.html
   # https://doc.rust-lang.org/src/core/option.rs.html
-  class Option
+  class Option[V]
     class TypeError < StandardError
-      def initialize: (untyped value_type) -> void
+      # wanted Class[V]
+      # no need declare new type V
+      def initialize: [V] (T[V] value_type) -> void
     end
 
     class TypeNilClass < StandardError
@@ -19,80 +21,93 @@ module Rs
     class UnwrapNone < StandardError
     end
 
-    def is_some: () -> untyped
+    def is_some: () -> bool
 
-    def is_some_and: () { (?) -> untyped } -> (untyped | false)
+    def is_some_and: () { (V) -> bool } -> bool
 
-    def is_none: () -> untyped
+    def is_none: () -> bool
 
-    def is_none_or: () { (?) -> untyped } -> (true | untyped)
+    def is_none_or: () { (V) -> bool } -> bool
 
-    def expect: (untyped msg) -> untyped
+    def expect: (String msg) -> V
 
-    def unwrap: () -> untyped
+    def unwrap: () -> V
 
-    def unwrap_or: (untyped default) -> untyped
+    def unwrap_or: (V default) -> V
 
-    def unwrap_or_else: () { (?) -> untyped } -> untyped
+    def unwrap_or_else: () { () -> V } -> V
 
-    def map: (untyped value_type) { (?) -> untyped } -> untyped
+    def map: [U] (T[U] value_type) { (V) -> U } -> Option[U]
 
-    def tap: () { (?) -> untyped } -> self
+    def tap: () { (V) -> bool } -> self
 
-    def map_or: (untyped default) { (?) -> untyped } -> untyped
+    def map_or: [U] (U default) { (V) -> U } -> U
 
-    def map_or_else: (untyped default) { (?) -> untyped } -> untyped
+    # work
+    # type int_or_string = Integer | String
+    # 
+    # not work
+    # type ld = lambda { () -> U }
+    # type ld = lambda { -> U }
+    # type pd = Proc(U)
+    # 
+    # want, crystal like
+    # type D = -> U
+    # type F = (V) -> U
+    # type F = V -> U
+    def map_or_else: [U] (Proc default) { (V) -> U } -> U
 
-    def ok_or: (untyped error) -> untyped
+    def ok_or: [E] (E error) -> Rs::Result[V, E]
 
-    def ok_or_else: () { (?) -> untyped } -> untyped
+    def ok_or_else: [E] () { () -> E } -> Rs::Result[V, E]
 
-    def and: (untyped other) -> untyped
+    def and: [U] (Option[U] other) -> Option[U]
 
-    def and_then: (untyped value_type) { (?) -> untyped } -> untyped
+    def and_then: [U] (T[U] value_type) { (V) -> Option[U] } -> Option[U]
 
-    def select: () { (?) -> untyped } -> untyped
+    def select: () { (V) -> bool } -> bool
 
-    def or: (untyped other) -> (self | untyped)
+    def or: (self other) -> self
 
-    def or_else: () { (?) -> untyped } -> (self | untyped)
+    def or_else: () { () -> self } -> self
 
-    def xor: (untyped other) -> untyped
+    def xor: (self other) -> self
 
-    def self.from: (untyped value_type) { (?) -> untyped } -> untyped
+    def self.from: [V] (T[V] value_type) { () -> V } -> self
 
-    def self.from?: (untyped value_type) { (?) -> untyped } -> untyped
+    def self.from?: [V] (T[V] value_type) { () -> V? } -> self
 
-    def self.from!: (untyped value_type) { (?) -> untyped } -> untyped
+    def self.from!: [V] (T[V] value_type) { () -> V } -> self
   end
 end
 
-class Some < Rs::Option
-  @value: untyped
+class Some[V] < Rs::Option[V]
+  @value: V
 
-  @value_type: untyped
+  # wanted Class[V]
+  @value_type: T[V]
 
-  attr_reader value_type: untyped
+  attr_reader value_type: T[V]
 
-  def self.[]: (untyped value_type) { (?) -> untyped } -> untyped
+  def self.[]: [V] (T[V] value_type) { () -> V } -> self
 
   def inspect: () -> ::String
 
-  def ==: (untyped other) -> untyped
+  def ==: (Rs::Option[V] other) -> bool
 
-  def initialize: (untyped value) -> void
+  def initialize: (V value) -> void
 end
 
-class None < Rs::Option
-  @value_type: untyped
+class None[V] < Rs::Option[V]
+  @value_type: T[V]
 
-  attr_reader value_type: untyped
+  attr_reader value_type: T[V]
 
-  def self.[]: (untyped value_type) -> untyped
+  def self.[]: [V] (T[V] value_type) -> self
 
   def inspect: () -> ::String
 
-  def ==: (untyped other) -> untyped
+  def ==: (Rs::Option[V] other) -> bool
 
-  def initialize: (?untyped value_type) -> void
+  def initialize: (?T[V] value_type) -> void
 end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require "rs/option"
-require "rs/result"
+require "rs/types"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -15,7 +15,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ## Usage
 
 ```ruby
-require "rs/result"
+require "rs/types"
 
 x = Some.new(2)
 x = None.new
