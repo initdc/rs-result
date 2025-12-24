@@ -6,7 +6,7 @@ module Rs
     VERSION: String
 
     class TypeError < StandardError
-      def initialize: (untyped value_type, untyped error_type) -> void
+      def initialize: [V, E] (T[V] value_type, T[E] error_type) -> void
     end
 
     class TypeNilClass < StandardError
@@ -24,94 +24,95 @@ module Rs
     class UnwrapErrOnOk < StandardError
     end
 
-    def is_ok: () -> untyped
+    def is_ok: () -> bool
 
-    def is_ok_and: () { (?) -> untyped } -> (untyped | false)
+    def is_ok_and: () { (V) -> bool } -> bool
 
-    def is_err: () -> untyped
+    def is_err: () -> bool
 
-    def is_err_and: () { (?) -> untyped } -> (untyped | false)
+    def is_err_and: () { (E) -> bool } -> bool
 
-    def ok: () -> untyped
+    def ok: () -> Rs::Option[V]
 
-    def err: () -> untyped
+    def err: () -> Rs::Option[E]
 
-    def map: (untyped value_type) { (?) -> untyped } -> untyped
+    def map: [U] (T[U] value_type) { (V) -> U } -> Result[U, E]
 
-    def map_or: (untyped default) { (?) -> untyped } -> untyped
+    def map_or: [U] (U default) { (V) -> U } -> U
 
-    def map_or_else: (untyped default) { (?) -> untyped } -> untyped
+    def map_or_else: [U] (Proc default) { (V) -> U } -> U
 
-    def map_err: (untyped error_type) { (?) -> untyped } -> untyped
+    def map_err: [F] (T[F] error_type) { (E) -> F } -> Result[V, F]
 
-    def tap: () { (?) -> untyped } -> self
+    def tap: () { (V) -> void } -> self
 
-    def tap_err: () { (?) -> untyped } -> self
+    def tap_err: () { (E) -> void } -> self
 
-    def expect: (untyped msg) -> untyped
+    def expect: (String msg) -> V
 
-    def unwrap: () -> untyped
+    def unwrap: () -> V
 
-    def expect_err: (untyped msg) -> untyped
+    def expect_err: (String msg) -> E
 
-    def unwrap_err: () -> untyped
+    def unwrap_err: () -> E
 
-    def and: (untyped other) -> untyped
+    def and: [U] (Result[U, E] other) -> Result[U, E]
 
-    def and_then: (untyped value_type) { (?) -> untyped } -> untyped
+    def and_then: [U] (T[U] value_type) { (V) -> Result[U, E] } -> Result[U, E]
 
-    def or: (untyped other) -> untyped
+    def or: [F] (Result[V, F] other) -> Result[V, F]
 
-    def or_else: (untyped error_type) { (?) -> untyped } -> untyped
+    def or_else: [F] (T[F] error_type) { (E) -> Result[V, F] } -> Result[V, F]
 
-    def unwrap_or: (untyped default) -> untyped
+    def unwrap_or: (V default) -> V
 
-    def unwrap_or_else: () { (?) -> untyped } -> untyped
+    def unwrap_or_else: () { (E) -> V } -> V
 
-    def self.from_or: (untyped value_type, untyped error) { (?) -> untyped } -> untyped
+    # type res_init = [V, E] (T[V], E) { () -> V } -> Result[V, E]
+    def self.from_or: [V, E] (T[V] value_type, E error) { () -> V } -> self
 
-    def self.from_or?: (untyped value_type, untyped error) { (?) -> untyped } -> untyped
+    def self.from_or?: [V, E] (T[V] value_type, E error) { () -> V? } -> self
 
-    def self.from_or!: (untyped value_type, untyped error) { (?) -> untyped } -> untyped
+    def self.from_or!: [V, E] (T[V] value_type, E error) { () -> V } -> self
   end
 end
 
 class Ok[V, E] < Rs::Result[V, E]
-  @value: untyped
+  @value: V
 
-  @value_type: untyped
+  @value_type: T[V]
 
-  @error_type: untyped
+  @error_type: T[E]
 
-  attr_accessor value_type: untyped
+  attr_accessor value_type: T[V]
 
-  attr_accessor error_type: untyped
+  attr_accessor error_type: T[E]
 
-  def self.[]: (untyped value_type, untyped error_type) { (?) -> untyped } -> untyped
+  def self.[]: [V, E] (T[V] value_type, E error) { () -> V } -> self
 
   def inspect: () -> ::String
 
-  def ==: (untyped other) -> untyped
+  def ==: (Rs::Result[V, E] other) -> Rs::Result[V, E]
 
-  def initialize: (untyped value) -> void
+  def initialize: (V value) -> void
 end
 
 class Err[V, E] < Rs::Result[V, E]
-  @error: untyped
+  @error: E
 
-  @error_type: untyped
+  @error_type: T[E]
 
-  @value_type: untyped
+  @value_type: T[V]
 
-  attr_accessor value_type: untyped
+  attr_accessor value_type: T[V]
 
-  attr_accessor error_type: untyped
+  attr_accessor error_type: T[E]
 
-  def self.[]: (untyped value_type, untyped error_type) { (?) -> untyped } -> untyped
+  def self.[]: [V, E] (T[V] value_type, E error) { () -> E } -> self
 
   def inspect: () -> ::String
 
-  def ==: (untyped other) -> untyped
+  def ==: (Rs::Result[V, E] other) -> Rs::Result[V, E]
 
-  def initialize: (untyped error) -> void
+  def initialize: (E error) -> void
 end
