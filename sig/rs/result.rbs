@@ -5,8 +5,8 @@ module Rs
   class Result[V, E]
     VERSION: String
 
-    class TypeError < StandardError
-      def initialize: [V, E] (T[V] value_type, T[E] error_type) -> void
+    class TypeError[V, E] < StandardError
+      def initialize: (T[V] value_type, T[E] error_type) -> void
     end
 
     class TypeNilClass < StandardError

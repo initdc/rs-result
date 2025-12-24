@@ -3,10 +3,8 @@ module Rs
   # https://doc.rust-lang.org/std/option/enum.Option.html
   # https://doc.rust-lang.org/src/core/option.rs.html
   class Option[V]
-    class TypeError < StandardError
-      # wanted Class[V]
-      # no need declare new type V
-      def initialize: [V] (T[V] value_type) -> void
+    class TypeError[V] < StandardError
+      def initialize: (T[V] value_type) -> void
     end
 
     class TypeNilClass < StandardError
